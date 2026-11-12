@@ -45,7 +45,7 @@ pytest tests/
 5. Click **Download**.
 6. Track progress in real-time; cancel anytime.
 7. Downloaded files appear in the **Recent Downloads** list.
-
+8. Most importantly create a Data folder then inside it create a downloads folder,all your downloads will be saved their
 Supported URL formats:
 - `https://www.youtube.com/watch?v=<id>`
 - `https://youtu.be/<id>`
