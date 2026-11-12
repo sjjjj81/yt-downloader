@@ -1,65 +1,127 @@
-# 🎬 Local YouTube Video Downloader
+# YouTube Downloader
 
-A personal YouTube video downloader that runs locally on your computer through a web-based interface. The project was built to explore web development and create a simple way to manage video downloads without relying on third-party downloader websites.
+Local browser-based YouTube downloader using Flask and yt-dlp.
 
-## ✨ Features
+## Requirements
 
-- **Local Hosting:** Runs on your own computer using localhost.
-- **Simple Interface:** Easy-to-use web interface for submitting video links.
-- **Video Processing:** Uses yt-dlp to handle video download requests.
-- **Local Downloads:** Saves downloaded files directly to your computer.
-- **Privacy:** The application is designed to run locally rather than requiring a hosted downloader service.
+- **Python 3.11+** — [python.org/downloads/](https://www.python.org/downloads/)
+- **FFmpeg** (recommended) — for audio extraction and video merging:
+  - [ffmpeg.org/download.html](https://ffmpeg.org/download.html)
+  - Chocolatey: `choco install ffmpeg`
+  - winget: `winget install FFmpeg`
+- **Node.js** (optional) — some yt-dlp extractors benefit from it:
+  - [nodejs.org](https://nodejs.org/)
 
-## 🛠️ Technologies Used
+## Quick Start (Windows)
 
-- **yt-dlp:** Video extraction and download processing.
-- **Localhost:** Local web application hosting.
-- **Frontend:** Web-based user interface.
-- **Backend:** Handles download requests and communicates with yt-dlp.
+```bat
+setup.bat    # Creates virtual environment and installs dependencies
+start.bat    # Starts the application
+```
 
+Then open **http://127.0.0.1:5000** in your browser.
 
-## ⚙️ How It Works
+## Manual Setup
 
-1. Open the application on your local machine.
-2. Enter a supported video URL in the interface.
-3. The backend processes the request using yt-dlp.
-4. The downloaded file is saved locally on your computer.
+```bash
+python -m venv .venv
+.venv\Scripts\activate          # On Windows
+pip install -r requirements.txt
+python run.py
+```
 
-## 🚀 Getting Started
+## Running Tests
 
-### Prerequisites
+```bash
+pytest tests/
+```
 
-- Python
-- flask 
-- yt-dlp
-- Required project dependencies
+## Usage
 
+1. Paste a YouTube URL into the input field.
+2. The app fetches video metadata automatically (title, thumbnail, available formats).
+3. Choose **Video** or **Audio** mode.
+4. Select quality (video) or format (audio).
+5. Click **Download**.
+6. Track progress in real-time; cancel anytime.
+7. Downloaded files appear in the **Recent Downloads** list.
 
+Supported URL formats:
+- `https://www.youtube.com/watch?v=<id>`
+- `https://youtu.be/<id>`
+- `https://www.youtube.com/shorts/<id>`
+- `https://www.youtube.com/embed/<id>`
 
-2. Install the required dependencies according to your project setup.
+## Configuration
 
-3. Start the local application using its configured startup command.
+Edit `app/config.py` to change defaults:
 
-4. Open the localhost address displayed in your terminal or application.
+| Setting | Default | Description |
+|---|---|---|
+| `DOWNLOAD_DIR` | `data/downloads` | Where files are saved |
+| `MAX_CONCURRENT_DOWNLOADS` | 2 | Parallel download limit |
+| `NETWORK_TIMEOUT` | 30 | Seconds before connection timeout |
+| `JOB_TTL` | 1 hour | How long job records are kept |
+| `PORT` | 5000 | Flask server port (`start.bat`) |
 
-## 🎯 Project Purpose
+## Troubleshooting
 
-This project started as a personal experiment to understand how web applications interact with backend systems and external libraries. It also helped me explore local hosting, video processing, and building practical tools.
+### "Python is not found in PATH"
+During Python installation, check **Add Python to PATH**. Then restart your terminal.
 
-## ⚖️ Disclaimer
+### "FFmpeg not found"
+Install FFmpeg (see Requirements above). Without it, audio extraction fails and video streams may not merge. Direct video downloads still work.
 
-This is an independent personal learning project and is not affiliated with, endorsed by, or associated with YouTube or Google.
+### "Port 5000 is already in use"
+```bat
+netstat -ano | findstr ":5000"
+```
+Find the PID and close the process, or edit `start.bat` to use a different port.
 
-This project uses [yt-dlp](https://github.com/yt-dlp/yt-dlp), an open-source software project.
+### "Required packages are missing"
+Re-run `setup.bat`. If that fails, delete the `.venv` folder and run `setup.bat` again.
 
-Users are responsible for ensuring that their use complies with applicable copyright laws, content permissions, and YouTube's Terms of Service.
+### "Virtual environment not found"
+Run `setup.bat` first. It creates `.venv` and installs all dependencies.
 
-Please only download content that you own or have permission to download. Do not use this project to distribute copyrighted material without authorization.
+## Limitations
 
-## 📚 Credits
+- **Browser-only**: The app runs as a local web server. No standalone desktop executable.
+- **YouTube only**: Only YouTube and YouTube Shorts URLs are accepted.
+- **Windows batch files**: `setup.bat` and `start.bat` are Windows-only. macOS/Linux users should use the manual setup steps above.
+- **No account login**: This tool does not support downloading copyrighted content you do not have rights to access.
+- **Rate limits**: YouTube may rate-limit requests. Space out your downloads.
+- **FFmpeg required for audio**: Audio extraction (mp3/m4a) requires FFmpeg. Without it, only raw video downloads work.
+- **Single-user**: The server binds to `127.0.0.1` only. It is not accessible from other machines on the network.
 
-- [yt-dlp](https://github.com/yt-dlp/yt-dlp) – Video processing and downloading library.
+## Security
 
----
+- All URLs are validated against a strict hostname allowlist (youtube.com, youtu.be only).
+- IP addresses, localhost, and arbitrary domains are rejected.
+- Filenames are sanitized; path traversal is blocked.
+- State-changing endpoints check the `Origin` header.
+- The server binds only to `127.0.0.1` — it is not exposed to the network.
+- Untrusted metadata from YouTube is HTML-escaped before display.
 
-**Built as a personal learning project.**
+## Project Structure
+
+```
+├── app/
+│   ├── __init__.py        # Flask application factory
+│   ├── config.py          # Configuration
+│   ├── routes.py          # HTTP endpoints
+│   ├── jobs.py            # Job tracking and state
+│   ├── validation.py      # URL validation
+│   ├── downloader.py      # yt-dlp integration
+│   ├── templates/
+│   │   └── index.html     # Frontend page
+│   └── static/
+│       ├── css/style.css  # Styles
+│       └── js/app.js      # Frontend logic
+├── tests/                 # pytest test suite
+├── data/downloads/        # Downloaded files
+├── setup.bat              # One-click setup (Windows)
+├── start.bat              # One-click start (Windows)
+├── run.py                 # Entry point
+└── requirements.txt       # Python dependencies
+```
