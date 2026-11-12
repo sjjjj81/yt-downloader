@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Downloader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>YouTube Downloader</h1>
+            <p>Download videos and audio directly to your local machine</p>
+        </header>
+
+        <main class="panel">
+            <!-- URL Input -->
+            <div class="form-group">
+                <label for="url-input">YouTube URL</label>
+                <div class="input-wrapper" id="url-wrapper">
+                    <input
+                        type="url"
+                        id="url-input"
+                        class="input-field"
+                        placeholder="https://www.youtube.com/watch?v=..."
+                        autocomplete="off"
+                        autofocus
+                    >
+                    <button type="button" id="clear-btn" class="clear-btn" title="Clear input">✕</button>
+                </div>
+            </div>
+
+            <!-- Metadata Preview -->
+            <div id="metadata-preview" class="metadata-preview" style="display: none;">
+                <img id="video-thumbnail" class="video-thumbnail" src="" alt="Video thumbnail">
+                <div class="video-info">
+                    <div id="video-title" class="video-title"></div>
+                    <div id="video-meta" class="video-meta"></div>
+                </div>
+            </div>
+
+            <!-- Mode Selector -->
+            <div class="form-group">
+                <label>Download Mode</label>
+                <div class="mode-selector">
+                    <button type="button" class="mode-toggle active" id="mode-video">Video</button>
+                    <button type="button" class="mode-toggle" id="mode-audio">Audio Only</button>
+                </div>
+            </div>
+
+            <!-- Quality/Format Settings -->
+            <div class="quality-group">
+                <!-- Video Quality -->
+                <div class="form-group" id="video-quality-group">
+                    <label for="quality-select">Video Quality</label>
+                    <select id="quality-select" class="select-field">
+                        <option value="best">Best Available</option>
+                        <option value="1080p">1080p</option>
+                        <option value="720p">720p</option>
+                        <option value="480p">480p</option>
+                    </select>
+                </div>
+
+                <!-- Audio Format -->
+                <div class="form-group" id="audio-format-group">
+                    <label for="audio-format-select">Audio Format</label>
+                    <select id="audio-format-select" class="select-field" disabled>
+                        <option value="mp3">MP3</option>
+                        <option value="m4a">M4A</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Download Destination -->
+            <div class="form-group">
+                <label>Download Destination</label>
+                <div class="download-destination">
+                    <span class="folder-icon">📁</span>
+                    <span id="download-destination">data/downloads</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button type="button" id="download-btn" class="btn btn-primary">
+                    <span>Download</span>
+                </button>
+                <button type="button" id="cancel-btn" class="btn btn-danger" style="display: none;">
+                    <span>Cancel</span>
+                </button>
+                <button type="button" id="retry-btn" class="btn btn-secondary" style="display: none;">
+                    <span>Retry</span>
+                </button>
+            </div>
+
+            <!-- Progress Section -->
+            <div class="progress-section" id="progress-section">
+                <div class="progress-header">
+                    <span>Downloading...</span>
+                    <span id="progress-text">0%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+            </div>
+
+            <!-- Status/Error Message -->
+            <div id="status-message" class="status-message"></div>
+        </main>
+
+        <!-- Recent Downloads -->
+        <section class="recent-downloads">
+            <h2>Recent Downloads (Session Only)</h2>
+            <div id="recent-list">
+                <div class="empty-state">
+                    <div class="empty-icon">⬇</div>
+                    <p>No downloads in this session</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
